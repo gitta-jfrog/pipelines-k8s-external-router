@@ -54,3 +54,13 @@ WITH
 ```
 
 ## 4. Deploy Pipelines chart
+```bash
+helm upgrade --install pipelines --namespace pipelines ./pipelines/. -f values.yaml
+```
+## 5. Verify Artifactory system.yaml:
+```yaml
+shared:
+  node:
+    ip: <ARTIFACTORY_PUBLIC_IP>
+    port: 8082 or 80
+```
