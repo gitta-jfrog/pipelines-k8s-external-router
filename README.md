@@ -54,6 +54,82 @@ WITH
 ```
 
 ## 4. Deploy Pipelines chart
+values.yaml
+```yaml
+existingSecret: ""
+
+postgresql:
+  postgresqlPassword: somepassword
+  image:
+    tag: 12.3.0-debian-10-r71
+unifiedUpgradeAllowed: true
+databaseUpgradeReady: true
+
+pipelines:
+  # Generate new one usin openssl rand -hex 32
+  masterKey: 689ccf61bace3ceed76059b1a13723274f625de7533dbcea487672472ce21c71
+  # Generate new one using uuidgen | tr '[:upper:]' '[:lower:]'
+  authToken: 11de15c0-42cf-4463-a117-b02ba9adb620
+  serviceId: jfpip@1234567898
+  joinKey: 
+  jfrogUrl: 
+  jfrogUrlUI: 
+  msg:
+    uiUserPassword: somepassword
+  www:
+    ingress:
+      enabled: true
+      annotations:
+        ingress.kubernetes.io/force-ssl-redirect: "false"
+        ingress.kubernetes.io/proxy-body-size: "0"
+        ingress.kubernetes.io/proxy-read-timeout: "600"
+        ingress.kubernetes.io/proxy-send-timeout: "600"
+        kubernetes.io/ingress.class: nginx
+        nginx.ingress.kubernetes.io/proxy-body-size: "0"
+      path: /
+      hosts:
+        - pipelines.example.com
+
+  api:
+    service:
+      type: LoadBalancer
+    ingress:
+      enabled: true
+      annotations:
+
+        ingress.kubernetes.io/force-ssl-redirect: "false"
+        ingress.kubernetes.io/proxy-body-size: "0"
+        ingress.kubernetes.io/proxy-read-timeout: "600"
+        ingress.kubernetes.io/proxy-send-timeout: "600"
+        kubernetes.io/ingress.class: nginx
+        nginx.ingress.kubernetes.io/proxy-body-size: "0"
+
+      path: /
+      hosts:
+        - pipelines-api.example.com
+
+
+rabbitmq:
+  enabled: true
+  replicaCount: 1
+  auth:
+    username: rmqadmin
+    password: password
+  ingress:
+    enabled: true
+    hostname: pipelines-msg.example.com
+    path: /
+    tls: false
+
+    annotations:
+      ingress.kubernetes.io/force-ssl-redirect: "false"
+      ingress.kubernetes.io/proxy-body-size: "0"
+      ingress.kubernetes.io/proxy-read-timeout: "600"
+      ingress.kubernetes.io/proxy-send-timeout: "600"
+      kubernetes.io/ingress.class: nginx
+      nginx.ingress.kubernetes.io/proxy-body-size: "0"
+      nginx.ingress.kubernetes.io/force-ssl-redirect: "false"
+```
 ```bash
 helm upgrade --install pipelines --namespace pipelines ./pipelines/. -f values.yaml
 ```
